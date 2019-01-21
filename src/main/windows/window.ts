@@ -137,7 +137,7 @@ class Window {
 
     options = _.merge ( dimensions, {
       frame: !is.macOS (),
-      backgroundColor: '#fdfdfd',
+      backgroundColor: '#181818',
       icon: path.join ( __static, 'images', `icon.${is.windows () ? 'ico' : 'png'}` ),
       show: false,
       title: pkg.productName,
@@ -145,10 +145,15 @@ class Window {
       webPreferences: {
         nodeIntegration: true,
         webSecurity: false
-      }
+      },
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0
     }, options );
 
     const win = new BrowserWindow ( options );
+    win.show ();
 
     state.manage ( win );
 
