@@ -31,6 +31,41 @@ const Markdown = {
 
   extensions: {
 
+    katex () {
+
+      try {
+
+        return showdownKatex ( Config.katex );
+
+      } catch ( e ) {
+
+        return `<p class="text-red">[KaTeX error: ${e.message}]</p>`;
+
+      }
+
+    },
+
+    mermaid () {
+
+      mermaid.initialize ( Config.mermaid );
+
+      return [{
+        type: 'language',
+        regex: '```mermaid([^`]*)```',
+        replace ( match, $1 ) {
+          const id = `mermaid-${CRC32.str ( $1 )}`;
+          try {
+            const svg = mermaid.render ( id, $1 );
+            return `<div class="mermaid">${svg}</div>`;
+          } catch ( e ) {
+            $(`#${id}`).remove ();
+            return `<p class="text-red">[mermaid error: ${e.message}]</p>`;
+          }
+        }
+      }];
+
+    },
+
     checkbox () {
 
       // We are wrapping the metadata (the match index, which is a number) in numbers so that the syntax highlighter won't probably mess with it and it's unlikely that somebody will ever write the same thing
@@ -108,7 +143,7 @@ const Markdown = {
           replace ( match, $1, $2, $3 ) {
             $2 = decodeURI ( $2 );
             const filePath = path.join ( attachmentsPath, $2 );
-            return `<img${$1}src="file://${filePath}" class="attachment" data-filename="${$2}"${$3}>`;
+            return `<img${$1}src="file://${encodeURI ( filePath )}" class="attachment" data-filename="${$2}"${$3}>`;
           }
         },
         { // Link Button
@@ -118,7 +153,7 @@ const Markdown = {
             $2 = decodeURI ( $2 );
             const basename = path.basename ( $2 );
             const filePath = path.join ( attachmentsPath, $2 );
-            return `<a${$1}href="file://${filePath}" class="attachment button gray" data-filename="${$2}"${$3}><i class="icon small">paperclip</i><span>${basename}</span></a>`;
+            return `<a${$1}href="file://${encodeURI ( filePath )}" class="attachment button gray" data-filename="${$2}"${$3}><i class="icon small">paperclip</i><span>${basename}</span></a>`;
           }
         },
         { // Link
@@ -127,7 +162,7 @@ const Markdown = {
           replace ( match, $1, $2, $3 ) {
             $2 = decodeURI ( $2 );
             const filePath = path.join ( attachmentsPath, $2 );
-            return `<a${$1}href="file://${filePath}" class="attachment" data-filename="${$2}"${$3}><i class="icon xsmall">paperclip</i>`;
+            return `<a${$1}href="file://${encodeURI ( filePath )}" class="attachment" data-filename="${$2}"${$3}><i class="icon xsmall">paperclip</i>`;
           }
         }
       ];
@@ -148,7 +183,7 @@ const Markdown = {
             $2 = decodeURI ( $2 );
             const basename = path.basename ( $2 );
             const filePath = path.join ( notesPath, $2 );
-            return `<a${$1}href="file://${filePath}" class="note button gray" data-filepath="${filePath}"${$3}><i class="icon small">note</i><span>${basename}</span></a>`;
+            return `<a${$1}href="file://${encodeURI ( filePath )}" class="note button gray" data-filepath="${filePath}"${$3}><i class="icon small">note</i><span>${basename}</span></a>`;
           }
         },
         { // Link
@@ -157,7 +192,7 @@ const Markdown = {
           replace ( match, $1, $2, $3 ) {
             $2 = decodeURI ( $2 );
             const filePath = path.join ( notesPath, $2 );
-            return `<a${$1}href="file://${filePath}" class="note" data-filepath="${filePath}"${$3}><i class="icon xsmall">note</i>`;
+            return `<a${$1}href="file://${encodeURI ( filePath )}" class="note" data-filepath="${filePath}"${$3}><i class="icon xsmall">note</i>`;
           }
         }
       ];
@@ -187,41 +222,6 @@ const Markdown = {
         }
       ];
 
-    },
-
-    katex () {
-
-      try {
-
-        return showdownKatex ( Config.katex );
-
-      } catch ( e ) {
-
-        return `<p class="text-red">[KaTeX error: ${e.message}]</p>`;
-
-      }
-
-    },
-
-    mermaid () {
-
-      mermaid.initialize ( Config.mermaid );
-
-      return [{
-        type: 'language',
-        regex: '```mermaid([^`]*)```',
-        replace ( match, $1 ) {
-          const id = `mermaid-${CRC32.str ( $1 )}`;
-          try {
-            const svg = mermaid.render ( id, $1 );
-            return `<div class="mermaid">${svg}</div>`;
-          } catch ( e ) {
-            $(`#${id}`).remove ();
-            return `<p class="text-red">[mermaid error: ${e.message}]</p>`;
-          }
-        }
-      }];
-
     }
 
   },
@@ -230,11 +230,11 @@ const Markdown = {
 
     if ( Markdown.converter ) return Markdown.converter;
 
-    const {checkbox, resolveRelativeLinks, encodeSpecialLinks, attachment, note, tag, katex, mermaid} = Markdown.extensions;
+    const {katex, mermaid, checkbox, resolveRelativeLinks, encodeSpecialLinks, attachment, note, tag} = Markdown.extensions;
 
     const converter = new showdown.Converter ({
       metadata: true,
-      extensions: [showdownHighlight, showdownTargetBlack, checkbox (), resolveRelativeLinks (), encodeSpecialLinks (), attachment (), note (), tag (), katex (), mermaid ()]
+      extensions: [showdownHighlight, showdownTargetBlack, katex (), mermaid (), checkbox (), resolveRelativeLinks (), encodeSpecialLinks (), attachment (), note (), tag ()]
     });
 
     converter.setFlavor ( 'github' );
