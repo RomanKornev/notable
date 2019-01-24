@@ -125,8 +125,6 @@ class Editor extends Container<EditorState, MainCTX> {
 
     focus: () => {
 
-      if ( document.activeElement && $.isEditable ( document.activeElement ) ) return;
-
       const cm = this.getCodeMirror ();
 
       if ( !cm ) return;
@@ -240,6 +238,16 @@ class Editor extends Container<EditorState, MainCTX> {
     const ele = $('.CodeMirror')[0];
 
     return ele && ele.CodeMirror;
+
+  }
+
+  getContent = (): string | undefined => {
+
+    const cm = this.getCodeMirror ();
+
+    if ( !cm ) return;
+
+    return cm.getValue ();
 
   }
 
