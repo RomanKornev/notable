@@ -16,6 +16,8 @@ class About extends Route {
 
     super ( name, options, stateOptions );
 
+    // # FIXME: Redraw About window due to white-flash-fix
+
   }
 
   /* SPECIAL */
