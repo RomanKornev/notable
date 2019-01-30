@@ -399,7 +399,8 @@ class Main extends Route {
           },
           { type: 'separator' },
           {
-            role: 'toggledevtools'
+            role: 'toggledevtools',
+            accelerator: ''
           }
         ]
       }
@@ -604,7 +605,7 @@ class Main extends Route {
 
     ipc.emit ( 'updater-check', true );
 
-    setTimeout ( this.initMenu, 2000 );
+    setTimeout ( this.initMenu.bind ( this ), 2000 );
 
   }
 

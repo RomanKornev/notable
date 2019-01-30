@@ -159,9 +159,17 @@ class App {
 
   __cwdChanged = () => {
 
-    if ( this.win ) this.win.win.close ();
+    if ( this.win && this.win.win ) {
 
-    this.load ();
+      this.win.win.once ( 'closed', this.load.bind ( this ) );
+
+      this.win.win.close ();
+
+    } else {
+
+      this.load ();
+
+    }
 
   }
 
@@ -175,9 +183,10 @@ class App {
 
   __updaterCheck = async ( notifications: Event | boolean = false ) => {
 
+    updater.removeAllListeners ();
+
     if ( notifications === true ) {
 
-      updater.removeAllListeners ();
       updater.on ( 'update-available', () => Notification.show ( 'A new update is available', 'Downloading it right now...' ) );
       updater.on ( 'update-not-available', () => Notification.show ( 'No update is available', 'You\'re already using the latest version' ) );
       updater.on ( 'error', err => Notification.show ( 'An error occurred', err.message ) );
