@@ -3,9 +3,10 @@
 
 import * as _ from 'lodash';
 import CallsBatch from 'calls-batch';
-import * as globby from 'globby';
+import glob from 'tiny-glob';
 import {Container, autosuspend} from 'overstated';
 import Config from '@common/config';
+import File from '@renderer/utils/file';
 import Utils from '@renderer/utils/utils';
 import watcher from '@renderer/utils/watcher';
 
@@ -33,11 +34,15 @@ class Notes extends Container<NotesState, MainCTX> {
 
   }
 
-  /* LYFECYCLE */
+  /* LIFECYCLE */
 
   refresh = async () => {
 
-    const filePaths = Utils.globbyNormalize ( await globby ( Config.notes.globs, { cwd: Config.notes.path, absolute: true } ) );
+    const notesPath = Config.notes.path;
+
+    if ( !notesPath || !await File.exists ( notesPath ) ) return;
+
+    const filePaths = Utils.normalizeFilePaths ( await glob ( Config.notes.glob, { cwd: notesPath, absolute: true, filesOnly: true } ) );
 
     const notes = {};
 
@@ -87,9 +92,12 @@ class Notes extends Container<NotesState, MainCTX> {
         if ( call[0] === unlink && index < lastDeleteIndex ) call[1][1] = false;
         return call;
       });
-      /* SKIPPING UPDATES ON MULTIPLE CHANGES */
+      /* SKIPPING UPDATES ON MULTIPLE CHANGES & MULTIPLE CONSECUTIVE CHANGES TO THE SAME FILE */
       const lastChangeIndex = _.findLastIndex ( queueNext, call => call[0] === change );
-      queueNext = queueNext.map ( ( call, index ) => {
+      queueNext = queueNext.filter ( ( call, index ) => {
+        const callNext = queueNext[index + 1];
+        return !callNext || call[0] !== callNext[0] || call[1][0] !== callNext[1][0];
+      }).map ( ( call, index ) => {
         if ( call[0] === change && index < lastChangeIndex ) call[1][1] = false;
         return call;
       });
@@ -103,10 +111,10 @@ class Notes extends Container<NotesState, MainCTX> {
 
     const add = async ( filePath, _refresh?: boolean ) => {
       if ( !isFilePathSupported ( filePath ) ) return;
-      const prevNote = this.ctx.note.get ( filePath );
-      if ( prevNote ) return;
       const note = await this.ctx.note.read ( filePath );
       if ( !note ) return;
+      const prevNote = this.ctx.note.get ( filePath );
+      if ( prevNote ) return;
       await this.ctx.note.add ( note, _refresh );
     };
 
@@ -120,11 +128,16 @@ class Notes extends Container<NotesState, MainCTX> {
         if ( isFilePathSupported ( filePath ) ) return unlink ( filePath );
         return;
       }
-      const note = this.ctx.note.get ( filePath );
-      if ( !note ) return add ( nextFilePath );
       const nextNote = await this.ctx.note.read ( nextFilePath );
       if ( !nextNote ) return;
+      const note = this.ctx.note.get ( filePath );
+      if ( !note ) return add ( nextFilePath );
       if ( this.ctx.note.is ( note, nextNote ) ) return;
+      if ( note.metadata.modified.getTime () > nextNote.metadata.modified.getTime () ) return;
+      if ( !nextNote.content.length && ( Math.abs ( note.metadata.modified.getTime () - nextNote.metadata.modified.getTime () ) < 1000 ) ) return; //FIXME: For some reason some times the note gets read as an empty string, maybe we are reading and writing at "the same" time and the file gets cleared?
+      const currentNote = this.ctx.note.get ();
+      const editorData = this.ctx.editor.getData ();
+      if ( editorData && this.ctx.note.is ( nextNote, currentNote ) && editorData.modified.getTime () > nextNote.metadata.modified.getTime () ) return;
       await this.ctx.note.replace ( note, nextNote, _refresh );
     };
 

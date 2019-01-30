@@ -1,3 +1,108 @@
+### Version 1.3.0
+
+##### New Features
+- Updater: added a menu entry for checking for updates
+- Added a menu entry for opening the subreddit
+- Added Wiki-style links supports
+- Added support for linking to attachments from `source` elements
+
+##### Improvements
+- Notes: avoiding unnecessary updates because of filesystem changes
+- Much more reliable autosaving and more accurate modification date
+- Dependencies: removed `remark` and `strip-markdown`
+- Dependencies: removed `showdown-target-blank`
+- Dependencies: removed `electron-localshortcut`
+- Dependencies: replaced `decompress` with `extract-zip`
+- Dependencies: replaced `globby` to `tiny-glob`
+- Dependencies: replaced `shallowequal` with `is-shallow-equal`
+- Dependencies: replaced `highlight.js` with `prism`
+- Dependencies: replaced `showdown-katex-studdown` with `asciimath2tex`
+- Dependencies: updated `enex-dump` (shaved ~10mb from bundle)
+- Updater: checking for updates after the app is loaded and every 24h
+- Markdown: avoiding storing previous renders
+- Tutorial: mentioning the subreddit and the Patreon page
+- Tutorial: mentioning Wiki-style links
+- Tutorial: updated sections about KaTeX and AsciiMath
+
+##### Bug Fixes
+- Fixed support for URLs fragments
+- Fixed support for relative links inside `a` and `img` tags
+- Markdown: made extensions much more reliable
+- Markdown: more advanced stripping logic
+- Markdown: un-wrapping the output when stripping
+- Markdown: improved support for emails
+- Markdown: ensuring anonymous code blocks are rendered properly
+- Autosave: properly handling app quits, window closes and reloads events
+- Ensuring the app quits when asked to do so
+- Ensuring the app doesn’t crash when changing data directory
+- Search: ensuring existing tags are still selectable even when they have no results
+- Avoiding refocusing windows twice
+- KaTeX: requiring a stricter syntax
+  - Wrap formulas in `$$..$$` and `$..$`
+  - There mustn't be spaces at the beginning and end of a formula
+  - The ending `$` character musn't be followed by a digit
+- AsciiMath: ensuring it doesn’t conflict with KaTeX
+  - Wrap formulas in `&&..&&` and `&..&`
+  - There mustn't be spaces at the beginning and end of a formula
+  - The ending `&` character musn't be followed by a digit
+- Ensuring the columns are not themselves scrollable
+- Improved toggleable checkboxes implementation
+- Removed shortcut for `Toggle Developer Tools`
+- Updater: ensuring secondary notifications are shown only when manually checking for updates
+- Updater: ensuring the menu gets properly restored after checking
+
+### Version 1.2.0
+
+##### New Features
+- Added a cross-platform “About” window
+- Export: added support for HTML
+- Export: added support for Markdown
+- Export: added support for PDF
+- Added “Undo” and “Redo” to the menu
+- Added an `Help -> View Changelog` menu entry
+- Added a menu entry for opening the devtools
+- Added a “Float on top” menu entry
+- Added a “New from Template” menu entry
+- Added a shortcut for “Permanently Delete”
+- Added some delete-key based shortcuts for trashing/restoring/deleting a note
+- Added basic support for range selection when holding shift key
+- Added support for toggling checkboxes in preview mode
+- Added a Split-View mode
+- Added autosaving capabilities
+- Preserving metadata about creation and modification dates
+
+##### Improvements
+- Tutorial: improved KaTeX syntax examples
+- Opening the parent of the current data directory when changing it
+- Opening the current attachments directory when adding some new attachments
+- Checking if the chosen data directory is the current one
+- Improved support for selecting all text
+- Markdown: added support for relative file paths as urls
+- Editor: preserving/restoring cursors on blur/focus
+- Readme: updated screenshots
+- Added Trilium to the comparison table
+- Added Joplin to the comparison table
+- Icon: slightly larger
+- Improved startup time: lazy loading heavy modules
+- Improved startup time: showing the window with a skeleton UI much quicker
+- Improved startup time: rendering the skeleton quicker
+- Optimized Markdown rendering when no Markdown features are used
+- Optimized Markdown stripping when no Markdown features are used
+- Upgraded electron to v4
+
+##### Bug Fixes
+- Avoiding copying the file to attach if it’s already an attachment
+- Linux: fixed icon generation
+- Much more resilient metadata sanitization and parsing
+- CodeMirror: avoiding restoring the cursors if the document height changed
+- Codemirror: properly focusing/resetting the editor
+- CodeMirror: resetting undo history when the note changes
+- Ensuring debugging tools are not used in production builds
+- Properly detecting “rename” events on Windows
+- Ensuring KaTeX doesn’t mess with generated paths
+- Markdown: properly encoding generated urls
+- Ensuring the currently active note remains active after editing its tags
+
 ### Version 1.1.0
 
 ##### New Features

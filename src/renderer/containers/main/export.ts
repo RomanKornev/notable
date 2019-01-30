@@ -61,7 +61,7 @@ class Export extends Container<ExportState, MainCTX> {
       const css = await this._getResources ([
         'node_modules/codemirror/lib/codemirror.css',
         'node_modules/codemirror-github-light/lib/codemirror-github-light-theme.css',
-        'node_modules/highlight.js/styles/github.css',
+        'node_modules/prism-github/prism-github.css',
         'node_modules/katex/dist/katex.min.css',
         'node_modules/primer-markdown/build/build.css',
         `${__static}/css/notable.min.css`
@@ -80,7 +80,9 @@ class Export extends Container<ExportState, MainCTX> {
           `<meta name="metadata:tags" content="${this.ctx.note.getTags ( note ).join ( ', ' )}">`,
           `<meta name="metadata:deleted" content="${this.ctx.note.isDeleted ()}">`,
           `<meta name="metadata:favorited" content="${this.ctx.note.isFavorited ()}">`,
-          `<meta name="metadata:pinned" content="${this.ctx.note.isPinned ()}">`
+          `<meta name="metadata:pinned" content="${this.ctx.note.isPinned ()}">`,
+          `<meta name="metadata:created" content="${this.ctx.note.getCreated ().toISOString ()}">`,
+          `<meta name="metadata:modified" content="${this.ctx.note.getModified ().toISOString ()}">`
         );
       }
 
