@@ -126,3 +126,19 @@ table a:hover {
 table a:active {
   color: #3f82c4;
 }
+
+/* Mermaid background labels*/
+.mermaid .messageText,
+.mermaid .titleText,
+.mermaid .sectionTitle
+/*.mermaid .tick*/
+/*.mermaid .looptext tspan*/ {
+  fill: #dcdcdc !important;
+}
+
+/* Mermaid Class Diagram arrow labels */
+.mermaid .classLabel .box {
+  opacity: 0.8 !important;
+  fill: #ECECFF !important;
+  stroke: #9370DB !important;
+}
